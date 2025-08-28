@@ -95,13 +95,14 @@
 
 <div class="card">
     <div class="card-header">
-        <h3>Student List</h3>
+        <h3>Student Enrollment List</h3>
         <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
             <div class="search-container">
-                <form method="GET" action="{% url 'student_list' %}" id="search-form">
-                <input type="text" name="q" id="search-input" placeholder="Search students..." value="{{ request.GET.q }}">
+                <form method="GET" action="{% url 'enrollment_list' student_pk=student.pk %}" id="search-form">
+                <input type="text" name="q" id="search-input" placeholder="Search Courses..." value="{{ request.GET.q }}">
                 <button type="submit"><i class="fa fa-search"></i> Search</button>
-            <a href="{% url 'add_student' %}" class="btn"><i class="fa fa-plus-circle"></i> Add New Student</a>
+            <a href="{% url 'add_enrollment' student_pk=student.pk %}" class="btn"><i class="fa fa-plus-circle"></i> Add New Enrollment</a>
+            <a href="{% url 'student_list'%}" class="btn"> Back to Student List</a>
 
             </form>
             </div>
@@ -113,26 +114,23 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Date of Birth</th>
+                    <th>Courses</th>
+                    <th>Grade</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% if students %}
-                    {% for student in students %}
+                {% if enrollments %}
+                    {% for enrollment in enrollments %}
                     <tr>
-                        <td>{{ student.pk }}</td>
-                        <td>{{ student.first_name }} {{ student.last_name }}</td>
-                        <td>{{ student.email }}</td>
-                        <td>{{ student.dob }}</td>
+                        <td>{{ enrollment.pk }}</td>
+                        <td>{{ enrollment.course.name }}-{{ enrollment.course.course_code }}</td>
+                        <td>{{ enrollment.score|default:"N/A" }}</td>
                         <td class="actions">
                             {% if user.is_superuser %}
-                            <a href="{% url 'enrollment_list' student_pk=student.pk %}"><i class="fa fa-eye"></i></a>
-                            <a href="{% url 'edit_student' pk=student.pk %}"><i class="fa fa-edit"></i></a>
+                            <a href="{% url 'edit_enrollment' student_pk=student.pk pk=enrollment.pk %}"><i class="fa fa-edit"></i></a>
                             
-                            <a href="#" onclick="event.preventDefault(); confirmAndDelete('{% url 'delete_student' pk=student.pk %}', '{{ student.first_name }} {{ student.last_name }}');">
+                            <a href="#" onclick="event.preventDefault(); confirmAndDelete('{% url 'delete_enrollment' student_pk=enrollment.student.pk pk=enrollment.pk %}', '{{ enrollment.student.first_name }} {{ enrollment.student.last_name }} in {{ enrollment.course.name }}');">
                                 <i class="fa fa-trash"></i>
                             </a>
                             {%endif%}
@@ -141,7 +139,7 @@
                     {% endfor %}
                 {% else %}
                 <tr>
-                    <td colspan="5">No students found.</td>
+                    <td colspan="5">No enrollments found.</td>
                 </tr>
                 {% endif %}
             </tbody>
@@ -152,8 +150,8 @@
     {% csrf_token %}
 </form>
 <script>
-    function confirmAndDelete(deleteUrl, studentName) {
-        if (confirm(`Are you sure you want to delete ${studentName}? This action cannot be undone.`)) {
+    function confirmAndDelete(deleteUrl, enrollmentName) {
+        if (confirm(`Are you sure you want to delete ${enrollmentName}? This action cannot be undone.`)) {
             const form = document.getElementById('deleteForm');
             form.action = deleteUrl;
             form.submit();

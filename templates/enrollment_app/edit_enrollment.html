@@ -1,0 +1,105 @@
+{% extends 'core/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* New CSS for form aesthetics and spacing */
+    .form-group label {
+        font-weight: 600;
+        color: #555;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-top: 5px;
+    }
+    .form-check {
+        margin-bottom: 10px; /* Adds space between radio buttons */
+    }
+    .btn {
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+    .btn-primary {
+        background-color: #5d5dff;
+        color: white;
+    }
+    .btn-secondary {
+        background-color: #e0e0e0;
+        color: #555;
+    }
+    .button-container {
+        margin-top: 20px;
+    }
+    .course-scroll-container {
+    height: 200px;
+    overflow-y: auto; 
+    padding-right: 15px; 
+    padding-left: 15px; 
+    border: 1px solid #ccc; 
+    border-radius: 8px; 
+    margin-top: 5px;
+}
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Edit New Enrollment</h3>
+    </div>
+    <div class="card-body">
+        {% if messages %}
+        <div class="messages-container" style="margin-bottom: 20px;">
+            {% for msg in messages %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>{{ msg }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group mb-3">
+            <label for="courses_radio">Courses</label>
+            <div class="course-scroll-container" id="courses_radio">
+                {% for course in courses %}
+                <div class="form-check">
+                    <input class="form-check-input course-radio" type="radio" name="course" id="course_{{ course.pk }}" value="{{ course.pk }}" {% if course == enrollment.course %}checked{% endif %}>
+                    <label class="form-check-label" for="course_{{ course.pk }}">
+                        {{ course.name }} ({{ course.course_code }})
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+             <div class="form-group mb-3">
+                <label for="score">Grade</label>
+                <input type="text" id="score" name="score" class="form-control" value="{{ enrollment.score}}">
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="metadata">Metadata (e.g., key1:value1, key2:value2)</label>
+                <input type="text" id="metadata" name="metadata" class="form-control" value="{{ form_data.metadata }}">
+            </div>
+            <div class="button-container">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{% url 'enrollment_list' student_pk=student.pk %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    
+</script>
+{% endblock content %}
+

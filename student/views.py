@@ -14,7 +14,20 @@ def index(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'core/dashboard.html')
+    """
+    Renders the dashboard with dynamic counts of students, courses, and instructors.
+    """
+    total_students = Student.objects.count()
+    total_courses = Course.objects.count()
+    total_instructors = Instructor.objects.count()
+
+    context = {
+        'total_students': total_students,
+        'total_courses': total_courses,
+        'total_instructors': total_instructors,
+    }
+
+    return render(request, 'core/dashboard.html',context)
 
 
 @login_required
@@ -376,6 +389,148 @@ def delete_course(request, pk):
         messages.success(request, f"Course '{course.name}' has been deleted successfully.")
     return redirect('course_list')
 
+
+@login_required
+def enrollment_list(request, student_pk):
+    """
+    Lists all enrollments for a given student.
+    """
+    student = get_object_or_404(Student, id=student_pk)
+    enrollments = Enrollment.objects.filter(student=student).select_related('course').prefetch_related('metadata')
+    query = request.GET.get('q')
+
+    if query:
+        enrollments = enrollments.filter(
+            Q(course__course_code__icontains=query)|
+            Q(course__name__icontains=query) 
+        ).distinct()
+
+    return render(request, 'enrollment_app/list_enrollment.html', {
+        'student': student,
+        'enrollments': enrollments,'query': query
+    })
+
+@login_required
+def add_enrollment(request, student_pk):
+    """
+    Handles adding a new enrollment for a specific student.
+    """
+    student = get_object_or_404(Student, pk=student_pk)
+    courses = Course.objects.all()
+  
+    if request.method == 'POST':
+        course_id = request.POST.get('course')
+        score = request.POST.get('score', None)
+        metadata_str = request.POST.get('metadata', '')
+
+        if not course_id:
+            messages.error(request, "A course is required.")
+            return render(request, 'enrollment_app/add_enrollment.html', {'student': student,'courses': courses})
+
+        try:
+            course = get_object_or_404(Course, pk=course_id)
+            if Enrollment.objects.filter(student=student, course=course).exists():
+                messages.error(request, "This student is already enrolled in the selected course.")
+                return render(request, 'enrollment_app/add_enrollment.html', {'student': student,'courses': courses})
+
+            enrollment = Enrollment(
+                student=student,
+                course=course,
+                score=score if score else None,
+            )
+            enrollment.full_clean()
+            enrollment.save()
+
+            if metadata_str:
+                pairs = [pair.strip() for pair in metadata_str.split(',')]
+                for pair in pairs:
+                    if ':' in pair:
+                        key, value = pair.split(':', 1)
+                        key = key.strip()
+                        value = value.strip()
+                        meta, created = Metadata.objects.get_or_create(key=key, value=value)
+                        enrollment.metadata.add(meta)
+
+            messages.success(request, f"Enrollment for {student.first_name}{student.last_name} in {course.name} added successfully.")
+            return redirect('enrollment_list', student_pk=student.pk)
+
+        except (ValidationError, Exception) as e:
+            if isinstance(e, ValidationError):
+                for field, errors in e.message_dict.items():
+                    for error in errors:
+                        messages.error(request, f"{field.replace('_', ' ').capitalize()}: {error}")
+            else:
+                messages.error(request, f"An unexpected error occurred: {e}")
+            
+            return render(request, 'enrollment_app/add_enrollment.html', {'student': student,'courses': courses})
+
+    return render(request, 'enrollment_app/add_enrollment.html', {'student': student,'courses': courses})
+
+
+@login_required
+def edit_enrollment(request, student_pk, pk):
+    """
+    Handles editing an existing enrollment for a specific student.
+
+    """
+    enrollment = get_object_or_404(Enrollment, pk=pk, student__pk=student_pk)
+    courses = Course.objects.all()
+
+    if request.method == 'POST':
+        selected_course_pk = request.POST.get('course')
+        selected_course = Course.objects.get(pk=selected_course_pk)
+        enrollment.course = selected_course
+        new_score = request.POST.get('score')
+        new_metadata_str = request.POST.get('metadata', '')
+
+        try:
+            enrollment.score = new_score if new_score else None
+            enrollment.full_clean()
+            enrollment.save()
+
+            enrollment.metadata.clear()
+            if new_metadata_str:
+                pairs = [pair.strip() for pair in new_metadata_str.split(',')]
+                for pair in pairs:
+                    if ':' in pair:
+                        key, value = pair.split(':', 1)
+                        key = key.strip()
+                        value = value.strip()
+                        meta, created = Metadata.objects.get_or_create(key=key, value=value)
+                        enrollment.metadata.add(meta)
+
+            messages.success(request, f"Enrollment for {enrollment.student.first_name} {enrollment.student.last_name} in {enrollment.course.name} updated successfully.")
+            return redirect('enrollment_list', student_pk=enrollment.student.pk)
+
+        except (ValidationError, Exception) as e:
+            if isinstance(e, ValidationError):
+                for field, errors in e.message_dict.items():
+                    for error in errors:
+                        messages.error(request, f"{field.replace('_', ' ').capitalize()}: {error}")
+            else:
+                messages.error(request, f"An unexpected error occurred: {e}")
+            
+
+            return render(request, 'enrollment_app/edit_enrollment.html', {'enrollment': enrollment,'student': enrollment.student, 'courses': courses})
+
+    # For a GET request, render the form with the existing enrollment data
+    return render(request, 'enrollment_app/edit_enrollment.html', {'enrollment': enrollment, 'student': enrollment.student, 'courses': courses})
+
+
+@login_required
+def delete_enrollment(request, student_pk, pk):
+    """
+    Handles the deletion of a specific enrollment.
+    """
+    if request.method == 'POST':
+        enrollment = get_object_or_404(Enrollment, pk=pk, student__pk=student_pk)
+        student_id = enrollment.student.pk
+        enrollment.delete()
+        messages.success(request, "Enrollment deleted successfully.")
+        return redirect('enrollment_list', student_pk=student_id)
+        
+    messages.error(request, "Invalid request method.")
+    return redirect('enrollment_list', student_pk=student_pk)
 
 
 # --- User Authentication Views ---

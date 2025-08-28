@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block title %} User Info {% endblock title %}
+
+{% block content %}
+<div class="card" style="width: 18rem; margin-left: 35%;">
+    <div class="card-header">
+      My Info
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">{{info.username}}</li>
+      <li class="list-group-item">{{info.email}}</li>
+      <a href="{% url 'reset_password' %}" class="list-group-item">Reset Password</a>
+    </ul>
+  </div>
+{% endblock content %}

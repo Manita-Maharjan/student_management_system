@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>{% block title %} {% endblock title %}</title>
+  </head>
+  <body>
+
+      <div>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <a class="navbar-brand" href="{% url 'index' %}">Home</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+              <li class="nav-item"><a class="nav-link" href="#">Courses</a></li>
+              <li class="nav-item"><a class="nav-link" href="#">Instructor</a></li>
+              <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{% url 'register' %}" class="btn btn-outline-light btn-sm mx-2">Register</a></li>
+                <li><a href="{% url 'signin' %}" class="btn btn-outline-light btn-sm">Login</a></li>
+            </ul>
+          </div>
+        </nav>
+
+        <!-- Hero Section -->
+
+        {% block content %}
+        {% load static %}
+
+        <!-- Image Container -->
+        <div class="image-container" 
+            style="position: relative; width: 100%; height: 400px; overflow: hidden;">
+
+        <!-- Background Image -->
+        <img src="{% static 'images/bgimage.jpg' %}" 
+            alt="Learning" 
+            style="width: 100%; height: 100%; object-fit: cover; display: block;">
+
+        <!-- Optional Dark Overlay -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.5);"></div>
+
+        <!-- Optional Content Overlay -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                    display: flex; flex-direction: column; justify-content: center; 
+                    align-items: center; color: white;">
+            <h1 class="display-4">Learning Through Fun</h1>
+            <p class="lead">Empowering students for a brighter future</p>
+            <a href="#" class="btn btn-light btn-lg">Apply Now</a>
+        </div>
+
+        </div>
+
+        <!-- Main Content -->
+        <main class="container py-5">
+          <!-- About Section -->
+          <section class="mb-5 text-center">
+            <h2>About Us</h2>
+            <p class="lead">MyCollege is dedicated to academic excellence, innovation, and student success.</p>
+          </section>
+
+          <!-- Programs Section -->
+          <section class="mb-5">
+            <h2 class="text-center">Our Programs</h2>
+            <div class="row mt-4">
+              <div class="col-md-4">
+                <div class="card shadow-sm">
+                  <div class="card-body"  style="background-color: #ffb774;">
+                    <h5 class="card-title">Science</h5>
+                    <p class="card-text">Explore cutting-edge research and build a strong foundation in science.</p>
+                    <a href="#" class="btn btn-primary btn-sm">Learn More</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card shadow-sm">
+                  <div class="card-body" style="background-color: #8e74ff;">
+                    <h5 class="card-title">Management</h5>
+                    <p class="card-text">Develop leadership skills and prepare for a career in business and management.</p>
+                    <a href="#" class="btn btn-primary btn-sm">Learn More</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card shadow-sm">
+                  <div class="card-body" style="background-color: #74d8ff;">
+                    <h5 class="card-title">Arts & Humanities</h5>
+                    <p class="card-text">Foster creativity and critical thinking with our arts and humanities programs.</p>
+                    <a href="#" class="btn btn-primary btn-sm">Learn More</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- News & Events Section -->
+          <section>
+            <h2 class="text-center">Latest News & Events</h2>
+            <div class="row mt-4">
+              <div class="col-md-6">
+                <h5>Admission Open for 2025</h5>
+                <p>We are now accepting applications for the 2025 academic year. Don’t miss the opportunity!</p>
+              </div>
+              <div class="col-md-6">
+                <h5>Annual College Fest</h5>
+                <p>Join us for an exciting celebration of culture, talent, and innovation at our annual fest.</p>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-white text-center py-3 mt-5">
+          <p>&copy; 2025 MyCollege | All Rights Reserved</p>
+        </footer>
+      </div>
+
+          {% endblock content %}
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
+

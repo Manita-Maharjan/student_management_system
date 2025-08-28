@@ -1,0 +1,155 @@
+{% extends 'core/dashboard.html' %}
+{% load static %}
+{% block title %} Course {% endblock title %}
+
+{% block content %}
+<style>
+    /* CSS for the table to match dashboard style */
+    .card-header .btn {
+        background-color: #5d5dff;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .table-container {
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    th {
+        background-color: #f4f7f9;
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+    tr:hover {
+        background-color: #f9fbfc;
+    }
+    .actions i {
+        cursor: pointer;
+        margin-right: 10px;
+        color: #777;
+        transition: color 0.3s;
+    }
+    .actions i:hover {
+        color: #5d5dff;
+    }
+    .search-container {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .search-container input {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 8px;
+    }
+
+    .search-container button {
+        background-color: #e0e0e0;
+        color: #555;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+</style>
+
+{% if messages %}
+<div class="messages-container" style="margin-bottom: 20px;">
+    {% for msg in messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{ msg }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h3>Course List</h3>
+        <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+            <div class="search-container">
+                <form method="GET" action="{% url 'course_list' %}" id="search-form">
+                <input type="text" name="q" id="search-input" placeholder="Search course..." value="{{ request.GET.q }}">
+                <button type="submit"><i class="fa fa-search"></i> Search</button>
+            <a href="{% url 'add_course' %}" class="btn"><i class="fa fa-plus-circle"></i> Add New Course</a>
+            </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Course Code</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if courses %}
+                    {% for course in courses %}
+                    <tr>
+                        <td>{{ course.pk }}</td>
+                        <td>{{ course.name }}</td>
+                        <td>{{ course.course_code}}</td>
+                        <td>{{ course.description }}</td>
+                        <td class="actions">
+                            {% if user.is_superuser %}
+                            <a href="{% url 'edit_course' pk=course.pk %}"><i class="fa fa-edit"></i></a>
+                            
+                            <a href="#" onclick="event.preventDefault(); confirmAndDelete('{% url 'delete_course' pk=course.pk %}', '{{ course.name }}');">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                            {%endif%}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5">No course found.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<form id="deleteForm" method="POST" style="display: none;">
+    {% csrf_token %}
+</form>
+<script>
+    function confirmAndDelete(deleteUrl, courseName) {
+        if (confirm(`Are you sure you want to delete ${courseName}? This action cannot be undone.`)) {
+            const form = document.getElementById('deleteForm');
+            form.action = deleteUrl;
+            form.submit();
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const searchForm = document.getElementById('search-form');
+        searchInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                searchForm.submit();
+            }
+        });
+    });
+</script>
+{% endblock content %}

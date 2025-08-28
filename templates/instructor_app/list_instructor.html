@@ -1,0 +1,162 @@
+{% extends 'core/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* CSS for the table to match dashboard style */
+    .card-header .btn {
+        background-color: #5d5dff;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .table-container {
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    th {
+        background-color: #f4f7f9;
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+    tr:hover {
+        background-color: #f9fbfc;
+    }
+    .actions i {
+        cursor: pointer;
+        margin-right: 10px;
+        color: #777;
+        transition: color 0.3s;
+    }
+    .actions i:hover {
+        color: #5d5dff;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+        color: white;
+        background-color: #6c757d;
+    }
+    .course-badge {
+        background-color: #007bff;
+    }
+    .search-container {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .search-container input {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 8px;
+    }
+
+    .search-container button {
+        background-color: #e0e0e0;
+        color: #555;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Instructor List</h3>
+        <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+            <div class="search-container">
+                <form method="GET" action="{% url 'instructor_list' %}" id="search-form">
+                <input type="text" name="q" id="search-input" placeholder="Search instructor..." value="{{ request.GET.q }}">
+                <button type="submit"><i class="fa fa-search"></i> Search</button>
+            <a href="{% url 'add_instructor' %}" class="btn"><i class="fa fa-plus-circle"></i> Add New Instructor</a>
+            </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Courses</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if instructors %}
+                    {% for instructor in instructors %}
+                    <tr>
+                        <td>{{ instructor.pk }}</td>
+                        <td>{{ instructor.first_name }} {{ instructor.last_name }}</td>
+                        <td>{{ instructor.email }}</td>
+                        <td>
+                            {% for course in instructor.courses.all %}
+                                <span class="badge course-badge">{{ course.name }}</span>
+                            {% endfor %}
+                        </td>
+                        
+                        <td class="actions">
+                            <a href="{% url 'edit_instructor' pk=instructor.pk %}"><i class="fa fa-edit"></i></a>
+                            <a href="#" onclick="event.preventDefault(); confirmAndDelete('{% url 'delete_instructor' pk=instructor.pk %}', '{{ instructor.first_name }} {{ instructor.last_name }}');">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6">No instructors found.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<form id="deleteForm" method="POST" style="display: none;">
+    {% csrf_token %}
+</form>
+<script>
+    function confirmAndDelete(deleteUrl, instructorName) {
+        if (confirm(`Are you sure you want to delete ${instructorName}? This action cannot be undone.`)) {
+            const form = document.getElementById('deleteForm');
+            form.action = deleteUrl;
+            form.submit();
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const searchForm = document.getElementById('search-form');
+        searchInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                searchForm.submit();
+            }
+        });
+    });
+</script>
+{% endblock content %}

@@ -1,0 +1,99 @@
+{% csrf_token %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f9; margin: 0; }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background-color: white; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .sidebar-header { padding-bottom: 20px; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px; }
+        .sidebar-header h2 { font-size: 1.5rem; color: #333; }
+        .sidebar-menu { list-style: none; padding: 0; }
+        .sidebar-menu a { display: flex; align-items: center; padding: 10px 15px; border-radius: 8px; text-decoration: none; color: #777; margin-bottom: 10px; transition: 0.3s; }
+        .sidebar-menu a.active { background-color: #5d5dff; color: white; }
+        .sidebar-menu a i { margin-right: 10px; }
+        .main-content { flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; }
+        .header p { color: #777; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { padding: 25px; border-radius: 12px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; }
+        .stat-card h3 { font-size: 2.5rem; }
+        .stat-card p { font-size: 1rem; }
+        .stat-card i { font-size: 80px; opacity: 0.2; position: absolute; right: 15px; }
+        .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .card { background-color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-header h3 { font-size: 1.2rem; }
+        .chart-placeholder { height: 250px; border: 2px dashed #e0e0e0; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #777; }
+        .progress-bar-container { height: 8px; background-color: #f4f7f9; border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; background-color: #5d5dff; border-radius: 5px; }
+        .donut-chart-info { text-align: center; margin-bottom: 20px; }
+        .donut-chart-info .percentages { display: flex; justify-content: space-between; color: #777; font-size: 0.9rem; }
+        .donut-chart-container { position: relative; width: 150px; height: 150px; margin: 0 auto; }
+        .donut-svg { transform: rotate(-90deg); }
+        .donut-legend { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
+        .legend-item { display: flex; align-items: center; font-size: 0.9rem; color: #777; }
+        .legend-item::before { content: ''; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+    </style>
+
+<body>
+
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="sidebar-header"><h2>Dashboard</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'dashboard' %}" class="active"><i class="fa fa-th-large"></i> Dashboard</a></li>
+                <li><a href="{% url 'student_list' %}"><i class="fa fa-user-graduate"></i> Student</a></li>
+                <li><a href="{% url 'course_list' %}"><i class="fa fa-book"></i> Courses</a></li>
+                <li><a href="{% url 'instructor_list' %}"><i class="fa fa-users"></i> Instructor</a></li>
+                
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1>Dashboard</h1>
+                </div>
+                <div>
+                    {% if user.is_authenticated %}
+                        <span style="margin-right:15px; color:#777;">Hello, {{ user.username }}</span>
+                        <a href="{% url 'index' %}" style="color:#777;"><i class="fa fa-sign-out-alt"></i> Logout</a>
+                    {% else %}
+                        <i class="fa fa-search" style="margin-right:15px; color:#777;"></i>
+                        <i class="fa fa-bell" style="margin-right:15px; color:#777;"></i>
+                        <i class="fa fa-moon" style="color:#777;"></i>
+                    {% endif %}
+                    
+                </div>
+            </div>
+
+            {%block content%}
+            
+            <div class="stats-grid">
+                <div class="stat-card" style="background-color: #ffb774;">
+                    <div><h3>1256</h3><p>Students</p></div>
+                    <i class="fa fa-user-graduate"></i>
+                </div>
+                <div class="stat-card" style="background-color: #8e74ff;">
+                    <div><h3>102</h3><p>Courses</p></div>
+                    <i class="fa fa-chalkboard-teacher"></i>
+                </div>
+                <div class="stat-card" style="background-color: #74d8ff;">
+                    <div><h3>102</h3><p>Instructor</p></div>
+                    <i class="fa fa-user-tie"></i>
+                </div>
+            </div>
+            {% endblock content %}
+
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

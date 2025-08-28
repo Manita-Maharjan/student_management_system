@@ -19,7 +19,7 @@ Make sure you have Python and Git installed on your system.
 
 Clone this project to your local machine and run the server using the following command:
 ```bash
-git clone 
+git clone https://github.com/Manita-Maharjan/student_management_system.git
 cd SMS
 # Create a virtual environment
 python -m venv venv

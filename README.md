@@ -7,7 +7,7 @@ This is a backend system for managing student profiles and their academic data, 
 * **Student Management:** CRUD functionality for student profiles, including first/last name, email, and date of birth.
 * **Academic Data:** Models to manage Courses, Instructors, and student Enrollments with grades and scores.
 * **Templating:** A simple, interactive frontend built with Django templates, HTML, CSS, JavaScript, and jQuery.
-* **Search & Filtering:** (Optional, if implemented) Functionality to search for students and courses.
+* **Search & Filtering:** Functionality to search for students and courses.
 
 ## 🚀 Setup and Installation
 
